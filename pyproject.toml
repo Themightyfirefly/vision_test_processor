@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "vision-test-processor"
+version = "0.0.1"
+
+dependencies = [
+    "numpy",
+    "scipy",
+]
+
+[project.scripts]
+process_test = "vision_test_processor.cli:cli"
