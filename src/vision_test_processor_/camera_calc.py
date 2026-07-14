@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.spatial.transform import Rotation
+from vision_test_processor.config import *
 
 def create_frame(
     right: np.ndarray,
@@ -90,3 +92,14 @@ def global_to_local(
         )
 
     return rotation_matrix.T @ (global_point - origin)
+
+def markers_to_camera(right: list[float], left: list[float], top: list[float]):    
+    # Calculate the position of the right mocap marker,
+    # and the rotation so that x is corresponding to the x axis of the camera (pointing to the front)
+    origin, rotation_matrix = create_frame(np.array(right), np.array(left), np.array(top))
+    # Apply the translation onto the right marker to get the camera position
+    global_point = local_to_global(np.array(CAMERA_TRANSLATION), origin, rotation_matrix)
+    roll, pitch, yaw = Rotation.from_matrix(
+        rotation_matrix
+    ).as_euler("xyz", degrees=False)
+    return global_point, roll, pitch, yaw
