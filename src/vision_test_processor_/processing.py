@@ -13,7 +13,7 @@ def load_mocap_data(path : str, start_time: float) -> dict[str, list[str]]:
     with open(path, 'r', encoding="utf-8-sig") as f:
         csv_data = csv.reader(f, delimiter=DELIMITER)
 
-        while (row := next(csv_data, None)) is not None and any(entry for entry in row):
+        while (row := next(csv_data, None)) is not None and (not header or any(entry for entry in row)):
             # Find the start of the marker positions (after pressure plate values)
             if not trj_reached and 'Trajectories' in row:
                 trj_reached = True
@@ -35,7 +35,7 @@ def load_mocap_data(path : str, start_time: float) -> dict[str, list[str]]:
             # Extract data
             if header:
                 # Only start extracting if start time has been reached
-                if float(row[header.index('_Frame')]) * 1 / MOCAP_FREQUENCY < start_time:
+                if float(row[header.index('_Frame')]) / MOCAP_FREQUENCY < start_time:
                     continue
                 for n_col in range(len(row)):
                     if header[n_col]:

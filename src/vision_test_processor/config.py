@@ -1,9 +1,9 @@
 # Main frequency of the mocap system (could be either cameras or pressure plates, depending on which is higher)
 # SYSTEM_FREQUENCY = 1000
 # Frequency of the cameras in the mocap system
-MOCAP_FREQUENCY = 1000
+MOCAP_FREQUENCY = 100
 
-DELIMITER = ';'
+DELIMITER = ','
 
 # Prefixes for csv headers
 CAMERA = 'Realsense_Camera'

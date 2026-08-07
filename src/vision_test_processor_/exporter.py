@@ -18,9 +18,11 @@ def export_init_position(dir_path: Path, init_position: dict):
         descr = json.dump(descr, f)
 
 def clear_ground_truths(dir_path: Path):
-    with open(dir_path / "test_description.json", "r") as f:
-        descr = json.load(f)
-    descr['ground_truths'] = {}
+    descr = {}
+    if (dir_path / "test_description.json").exists():
+        with open(dir_path / "test_description.json", "r") as f:
+            descr = json.load(f)
+        descr['ground_truths'] = {}
     with open(dir_path / "test_description.json", "w") as f:
         descr = json.dump(descr, f)
         

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import json
+from pathlib import Path
 
 def plot_system_diagnostics(bag_path: Path):
     with open(bag_path / 'results/system_diagnostics.json', 'r') as f:

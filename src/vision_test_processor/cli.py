@@ -38,7 +38,17 @@ def cli():
     if not (args.starting_time_bag and args.starting_time_mocap):
         print("No postprocessing of test results. To start processing include values for starting_time_camera and starting_time_mocap")
         return
-    raw_data = load_mocap_data(f'{args.directory_location}/mocap_raw.csv', args.starting_time_mocap)
+
+    csv_files = [f.name for f in list(dir_path.glob("*.csv"))]
+    mocap_name = ""
+    if "mocap_raw.csv" in csv_files:
+        mocap_name = "mocap_raw.csv"
+    elif len(csv_files) == 1:
+        mocap_name = csv_files[0]
+    else:
+        raise ValueError("More than one csv file found. Rename the mocap file to 'mocap_raw.csv'")
+
+    raw_data = load_mocap_data(f'{args.directory_location}/{mocap_name}', args.starting_time_mocap)
     # Calculate times from frames in ms
     raw_data['time'] = [1 / MOCAP_FREQUENCY * int(frame) if frame else -1 for frame in raw_data['_Frame']]
     camera_pos = get_camera_positions(raw_data, args.starting_time_mocap)
