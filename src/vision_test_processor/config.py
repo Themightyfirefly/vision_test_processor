@@ -24,4 +24,4 @@ TEST_AREA_PADDING_Y = 300
 
 # Translation in x, y, z from the right marker to the camera origin in cm (following the cameras axes)
 # A visualisation for the axes: https://github.com/realsenseai/realsense-ros#ros2robot-vs-opticalcamera-coordination-systems
-CAMERA_TRANSLATION = [0.0, 0.0, 0.0]
+CAMERA_TRANSLATION = [3.9, 2.55, 0.0]

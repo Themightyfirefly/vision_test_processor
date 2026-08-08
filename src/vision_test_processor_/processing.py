@@ -8,9 +8,9 @@ from vision_test_processor_.camera_calc import create_frame, local_to_global, ma
 def load_mocap_data(path : str, start_time: float) -> dict[str, list[str]]:
     trj_reached = False
     header = []
-    data = {"time": []}
+    data = {'time': []}
     
-    with open(path, 'r', encoding="utf-8-sig") as f:
+    with open(path, 'r', encoding='utf-8-sig') as f:
         csv_data = csv.reader(f, delimiter=DELIMITER)
 
         while (row := next(csv_data, None)) is not None and (not header or any(entry for entry in row)):
@@ -52,17 +52,21 @@ def get_camera_positions(raw_data, mocap_start):
         'pitch': [],
         'yaw': [],
     }
-    for i in range(len(raw_data["time"])):
-        if raw_data["time"][i] < mocap_start:
+    init_time_frame = None
+    for i in range(len(raw_data['time'])):
+        if raw_data['time'][i] < mocap_start:
             continue
-        right = [raw_data[f"{CAMERA}:{RIGHT}_X"][i], raw_data[f"{CAMERA}:{RIGHT}_Y"][i], raw_data[f"{CAMERA}:{RIGHT}_Z"][i]]
-        left = [raw_data[f"{CAMERA}:{LEFT}_X"][i], raw_data[f"{CAMERA}:{LEFT}_Y"][i], raw_data[f"{CAMERA}:{LEFT}_Z"][i]]
-        top = [raw_data[f"{CAMERA}:{TOP}_X"][i], raw_data[f"{CAMERA}:{TOP}_Y"][i], raw_data[f"{CAMERA}:{TOP}_Z"][i]]
+        if init_time_frame is None:
+            init_time_frame = raw_data['time'][i]
+            print(f"Initial time frame: {init_time_frame}")
+        right = [raw_data[f'{CAMERA}:{RIGHT}_X'][i], raw_data[f'{CAMERA}:{RIGHT}_Y'][i], raw_data[f'{CAMERA}:{RIGHT}_Z'][i]]
+        left = [raw_data[f'{CAMERA}:{LEFT}_X'][i], raw_data[f'{CAMERA}:{LEFT}_Y'][i], raw_data[f'{CAMERA}:{LEFT}_Z'][i]]
+        top = [raw_data[f'{CAMERA}:{TOP}_X'][i], raw_data[f'{CAMERA}:{TOP}_Y'][i], raw_data[f'{CAMERA}:{TOP}_Z'][i]]
         # Skip the current values if a marker is missing
         if not all([pos[i] for i in range(3) for pos in [right, left, top]]):
             continue
         global_point, roll, pitch, yaw = markers_to_camera(right, left, top)
-        camera_pos['time'].append(raw_data['time'][i])
+        camera_pos['time'].append(raw_data['time'][i] - init_time_frame)
         camera_pos['x'].append(global_point[0])
         camera_pos['y'].append(global_point[1])
         camera_pos['z'].append(global_point[2])

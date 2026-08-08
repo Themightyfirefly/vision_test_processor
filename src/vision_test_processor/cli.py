@@ -50,7 +50,7 @@ def cli():
 
     raw_data = load_mocap_data(f'{args.directory_location}/{mocap_name}', args.starting_time_mocap)
     # Calculate times from frames in ms
-    raw_data['time'] = [1 / MOCAP_FREQUENCY * int(frame) if frame else -1 for frame in raw_data['_Frame']]
+    raw_data['time'] = [int(frame) / MOCAP_FREQUENCY if frame else -1 for frame in raw_data['_Frame']]
     camera_pos = get_camera_positions(raw_data, args.starting_time_mocap)
 
     # Clear all keys that can remain empty
