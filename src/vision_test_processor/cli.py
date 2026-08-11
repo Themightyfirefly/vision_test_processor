@@ -13,32 +13,59 @@ from vision_test_processor_.exporter import (
     export_starting_times
 )
 from vision_test_processor_.ground_truths import extract_triangles
-from vision_test_processor_.plotting import plot_heightmap, plot_system_diagnostics, plot_odom
+from vision_test_processor_.plotting import plot_heightmap, plot_system_diagnostics, plot_odom, plot_odom_raw
 
 def cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('directory_location', help='Path to the directory that includes csv, bag and such.')
-    parser.add_argument('starting_time_bag', type=float, nargs="?", help='Starting time of the camera bag in s.')
-    parser.add_argument('starting_time_mocap', type=float, nargs="?", help='Starting time of the mocap in s.')
-    parser.add_argument('--plot_heightmap', action='store_true', help='Plot the heightmap in 3D including measured errors.')
-    parser.add_argument('--plot_system_diagnostics', action='store_true', help='Plot the cpu usage during test.')
-    parser.add_argument('--plot_odom', action='store_true', help='Plot the errors of the odometry.')
-    
-    
-    args = parser.parse_args()
-    dir_path = Path(args.directory_location)
-    if args.plot_heightmap:
-        plot_heightmap(dir_path)
-    if args.plot_system_diagnostics:
-        plot_system_diagnostics(dir_path)
-    if args.plot_odom:
-        plot_odom(dir_path)
-    
-    
-    if not (args.starting_time_bag and args.starting_time_mocap):
-        print("No postprocessing of test results. To start processing include values for starting_time_camera and starting_time_mocap")
-        return
+    commands = parser.add_subparsers(dest='command', required=True)
 
+    # Prep is used to exctract data from a mocap csv file and to write json test descriptions.
+    # It can then be tested by the vision tests in rise-os-core.
+    prep_parser = commands.add_parser('prep')
+    prep_parser.set_defaults(func=prep)
+    prep_parser.add_argument('directory_location', help='Path to the directory that includes csv, bag and such.')
+    prep_parser.add_argument('starting_time_bag', type=float, nargs="?", help='Starting time of the camera bag in s.')
+    prep_parser.add_argument('starting_time_mocap', type=float, nargs="?", help='Starting time of the mocap in s.')
+
+
+    # The 'plot' command visualises all kinds of analysis results
+    plot_parser = commands.add_parser('plot')
+    plot_parser.set_defaults(func=plot)
+    plot_commands = plot_parser.add_subparsers(dest='target', required=True)
+
+    heightmap_parser = plot_commands.add_parser('heightmap')
+    heightmap_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
+
+    system_parser = plot_commands.add_parser('diagnostics')
+    system_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
+    
+    odom_error_parser = plot_commands.add_parser('odom_error')
+    odom_error_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
+    
+    odom_raw_parser = plot_commands.add_parser('odom_raw')
+    odom_raw_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
+    
+
+    args = parser.parse_args()
+    args.func(args)
+
+        
+def plot(args):
+    match args.target:
+        case 'heightmap':
+            plot_heightmap(Path(args.directory_location))
+        case 'diagnostics':
+            plot_system_diagnostics(Path(args.directory_location))
+        case 'odom_error':
+            plot_odom(Path(args.directory_location))
+        case 'odom_raw':
+            plot_odom_raw(Path(args.directory_location))
+        case _:
+            pass
+
+
+def prep(args):
+    dir_path = Path(args.directory_location)
     csv_files = [f.name for f in list(dir_path.glob("*.csv"))]
     mocap_name = ""
     if "mocap_raw.csv" in csv_files:
@@ -76,5 +103,3 @@ def cli():
         export_triangles(dir_path, triangles)
         test_area = get_test_area(triangles)
         export_test_area(dir_path, test_area)
-        
-    

@@ -84,3 +84,26 @@ def plot_odom(bag_path):
         ax.grid(True)
         
     plt.show()
+
+def plot_odom_raw(bag_path):
+    with open(bag_path / 'results/odom_raw_rec.json', 'r') as f:
+        odom_rec = json.load(f)
+    with open(bag_path / 'results/odom_raw_truth.json', 'r') as f:
+        odom_truth = json.load(f)
+        
+    _, axes = plt.subplots(2, 3, figsize=(12, 7), constrained_layout=True)
+    
+    keys = [
+        k_rec for k_rec in odom_rec.keys() for k_truth in odom_truth.keys() 
+        if k_rec == k_truth and k_rec != 'time'
+    ]
+    y_lables = ['error in mm']*3 + ['error in rad']*3
+    for ax, key, y_lable in zip(axes.flat, keys, y_lables):
+        ax.plot(odom_rec['time'], odom_rec[key], label='recording')
+        ax.plot(odom_truth['time'], odom_truth[key], label='truth')
+        ax.set_title(key)
+        ax.set_xlabel("time in s")
+        ax.set_ylabel(y_lable)
+        ax.grid(True)
+        
+    plt.show()

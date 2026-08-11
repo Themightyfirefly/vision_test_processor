@@ -14,4 +14,4 @@ dependencies = [
 ]
 
 [project.scripts]
-process_test = "vision_test_processor.cli:cli"
+vision_test = "vision_test_processor.cli:cli"
