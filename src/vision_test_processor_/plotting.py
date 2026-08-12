@@ -14,8 +14,9 @@ def plot_system_diagnostics(bag_path: Path):
     plt.ylabel("cpu usage in %")
     plt.show()
 
-def plot_heightmap(bag_path: Path):
-    hmap = np.load(bag_path / 'results/heightmap.npy', allow_pickle=True)
+def plot_heightmap(bag_path: Path, corrected = False):
+    filename = 'heightmap_corrected' if corrected else 'heightmap'
+    hmap = np.load(bag_path / f'results/{filename}.npy', allow_pickle=True)
     
     xs = np.unique(hmap[:, 0])
     ys = np.unique(hmap[:, 1])
@@ -38,6 +39,7 @@ def plot_heightmap(bag_path: Path):
     valid_errors = Error[np.isfinite(Error)]
     if valid_errors.size == 0:
         raise ValueError("No valid error values found.")
+    
     norm = colors.Normalize(
         vmin=0,
         vmax=np.max(valid_errors),

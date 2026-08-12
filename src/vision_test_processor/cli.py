@@ -36,6 +36,9 @@ def cli():
     heightmap_parser = plot_commands.add_parser('heightmap')
     heightmap_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
 
+    heightmap_corr_parser = plot_commands.add_parser('heightmap_corrected')
+    heightmap_corr_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
+
     system_parser = plot_commands.add_parser('diagnostics')
     system_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
     
@@ -54,6 +57,8 @@ def plot(args):
     match args.target:
         case 'heightmap':
             plot_heightmap(Path(args.directory_location))
+        case 'heightmap_corrected':
+            plot_heightmap(Path(args.directory_location), corrected=True)
         case 'diagnostics':
             plot_system_diagnostics(Path(args.directory_location))
         case 'odom_error':

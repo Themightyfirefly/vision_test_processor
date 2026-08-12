@@ -58,7 +58,6 @@ def get_camera_positions(raw_data, mocap_start):
             continue
         if init_time_frame is None:
             init_time_frame = raw_data['time'][i]
-            print(f"Initial time frame: {init_time_frame}")
         right = [raw_data[f'{CAMERA}:{RIGHT}_X'][i], raw_data[f'{CAMERA}:{RIGHT}_Y'][i], raw_data[f'{CAMERA}:{RIGHT}_Z'][i]]
         left = [raw_data[f'{CAMERA}:{LEFT}_X'][i], raw_data[f'{CAMERA}:{LEFT}_Y'][i], raw_data[f'{CAMERA}:{LEFT}_Z'][i]]
         top = [raw_data[f'{CAMERA}:{TOP}_X'][i], raw_data[f'{CAMERA}:{TOP}_Y'][i], raw_data[f'{CAMERA}:{TOP}_Z'][i]]
