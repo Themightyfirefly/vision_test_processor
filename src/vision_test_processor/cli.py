@@ -1,10 +1,11 @@
 import argparse
 from pathlib import Path
 import json
-from vision_test_processor_.processing import get_camera_positions, load_mocap_data, get_test_area
-from vision_test_processor.config import *
+
+from vision_test_processor_.eval import eval_heightmap, eval_odom, eval_system_diagnostics
 from vision_test_processor_.exporter import (
     export_camera_pos,
+    export_eval,
     export_init_position,
     export_triangles,
     export_test_area,
@@ -13,7 +14,12 @@ from vision_test_processor_.exporter import (
     export_starting_times
 )
 from vision_test_processor_.ground_truths import extract_triangles
+from vision_test_processor_.join_results import join_results
 from vision_test_processor_.plotting import plot_heightmap, plot_system_diagnostics, plot_odom, plot_odom_raw
+from vision_test_processor_.processing import get_camera_positions, load_mocap_data, get_test_area
+
+from vision_test_processor.config import *
+
 
 def cli():
     parser = argparse.ArgumentParser()
@@ -47,7 +53,20 @@ def cli():
     
     odom_raw_parser = plot_commands.add_parser('odom_raw')
     odom_raw_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
-    
+
+
+    # The 'eval' commad calculates single result values
+    eval_parser = commands.add_parser('eval')
+    eval_parser.set_defaults(func=eval)
+    eval_parser.add_argument('directory_location', nargs='+', help='Path to the bag directory that includes the results directory.')
+    eval_parser.add_argument('--all', action='store_true', help='Instead of passing a single bag, pass a directory with multiple bags inside.')
+
+
+    # Generate joint test results for all tests in a directory
+    joint_parser = commands.add_parser('join_results')
+    joint_parser.set_defaults(func=call_join)
+    joint_parser.add_argument('test_bag_locations', nargs='+', help='Paths to the directories that includes the test bag directories')
+    joint_parser.add_argument('--write_to', default='joint_test_results.csv', help='Path to the output csv file. Default is ./joint_test_results.csv')
 
     args = parser.parse_args()
     args.func(args)
@@ -108,3 +127,28 @@ def prep(args):
         export_triangles(dir_path, triangles)
         test_area = get_test_area(triangles)
         export_test_area(dir_path, test_area)
+
+def eval(args):
+    dirs_to_eval = []
+    if len(args.directory_location) == 0:
+        raise IndexError('Path to bag directory required.')
+    if args.all:
+        dirs_to_eval += [
+            bag for dir in args.directory_location for bag in Path(dir).iterdir()
+            if bag.is_dir()
+            and (bag / "results").exists()
+        ]
+    else:
+        dirs_to_eval.append(Path(args.directory_location[0]))
+
+    for dir_path in dirs_to_eval:
+        print(f"Evaluating {dir_path}")
+        results = {}
+        results |= eval_system_diagnostics(dir_path)
+        results |= eval_odom(dir_path)
+        results |= eval_heightmap(dir_path)
+        export_eval(dir_path, results)
+
+def call_join(args):
+    test_dirs = [Path(test_dir) for test_dir in args.test_bag_locations]
+    join_results(test_dirs, Path(args.write_to))

@@ -68,3 +68,7 @@ def export_starting_times(dir_path, bag_start, mocap_start):
     descr['mocap_start'] = mocap_start
     with open(dir_path / "test_description.json", "w") as f:
         descr = json.dump(descr, f)
+
+def export_eval(dir_path: Path, results: dict):
+    with open(dir_path / "results/test_results.json", "w") as f:
+        json.dump(results, f)
