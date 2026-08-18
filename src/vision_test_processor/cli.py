@@ -23,7 +23,6 @@ from vision_test_processor.config import *
 
 def cli():
     parser = argparse.ArgumentParser()
-<<<<<<< Updated upstream
     commands = parser.add_subparsers(dest='command', required=True)
 
     # Prep is used to exctract data from a mocap csv file and to write json test descriptions.
@@ -48,15 +47,6 @@ def cli():
 
     system_parser = plot_commands.add_parser('diagnostics')
     system_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
-=======
-    parser.add_argument('directory_location', help='Path to the directory that includes csv, bag and such.')
-    parser.add_argument('starting_time_bag', type=float, nargs="?", help='Starting time of the camera bag in s.')
-    parser.add_argument('starting_time_mocap', type=float, nargs="?", help='Starting time of the mocap in s.')
-    parser.add_argument('--plot_heightmap', action='store_true', help='Plot the heightmap in 3D including measured errors.')
-    parser.add_argument('--plot_corrected_heightmap', action='store_true', help='Plot the corrected heightmap in 3D including measured errors.')
-    parser.add_argument('--plot_system_diagnostics', action='store_true', help='Plot the cpu usage during test.')
-    parser.add_argument('--plot_odom', action='store_true', help='Plot the errors of the odometry.')
->>>>>>> Stashed changes
     
     odom_error_parser = plot_commands.add_parser('odom_error')
     odom_error_parser.add_argument('directory_location', help='Path to the bag directory that includes the results directory.')
@@ -100,7 +90,6 @@ def plot(args):
 
 def prep(args):
     dir_path = Path(args.directory_location)
-<<<<<<< Updated upstream
     csv_files = [f.name for f in list(dir_path.glob("*.csv"))]
     mocap_name = ""
     if "mocap_raw.csv" in csv_files:
@@ -113,24 +102,6 @@ def prep(args):
     raw_data = load_mocap_data(f'{args.directory_location}/{mocap_name}', args.starting_time_mocap)
     # Calculate times from frames in ms
     raw_data['time'] = [int(frame) / MOCAP_FREQUENCY if frame else -1 for frame in raw_data['_Frame']]
-=======
-    if args.plot_heightmap:
-        plot_heightmap(dir_path)
-    if args.plot_corrected_heightmap:
-        plot_heightmap(dir_path, corrected = True)
-    if args.plot_system_diagnostics:
-        plot_system_diagnostics(dir_path)
-    if args.plot_odom:
-        plot_odom(dir_path)
-    
-    
-    if not (args.starting_time_bag and args.starting_time_mocap):
-        print("No postprocessing of test results. To start processing include values for starting_time_camera and starting_time_mocap")
-        return
-    raw_data = load_mocap_data(f'{args.directory_location}/mocap_raw.csv', args.starting_time_mocap)
-    # Calculate times from frames in ms
-    raw_data['time'] = [1 / MOCAP_FREQUENCY * int(frame)-int(raw_data['_Frame'][0]) if frame else -1 for frame in raw_data['_Frame']]
->>>>>>> Stashed changes
     camera_pos = get_camera_positions(raw_data, args.starting_time_mocap)
 
     # Clear all keys that can remain empty

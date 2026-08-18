@@ -15,15 +15,8 @@ def plot_system_diagnostics(bag_path: Path):
     plt.show()
 
 def plot_heightmap(bag_path: Path, corrected = False):
-<<<<<<< Updated upstream
     filename = 'heightmap_corrected' if corrected else 'heightmap'
     hmap = np.load(bag_path / f'results/{filename}.npy', allow_pickle=True)
-=======
-    if corrected:
-        hmap = np.load(bag_path / 'results/corrected_heightmap.npy', allow_pickle=True)
-    else:
-        hmap = np.load(bag_path / 'results/heightmap.npy', allow_pickle=True)
->>>>>>> Stashed changes
     
     xs = np.unique(hmap[:, 0])
     ys = np.unique(hmap[:, 1])
