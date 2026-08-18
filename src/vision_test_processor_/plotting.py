@@ -15,8 +15,15 @@ def plot_system_diagnostics(bag_path: Path):
     plt.show()
 
 def plot_heightmap(bag_path: Path, corrected = False):
+<<<<<<< Updated upstream
     filename = 'heightmap_corrected' if corrected else 'heightmap'
     hmap = np.load(bag_path / f'results/{filename}.npy', allow_pickle=True)
+=======
+    if corrected:
+        hmap = np.load(bag_path / 'results/corrected_heightmap.npy', allow_pickle=True)
+    else:
+        hmap = np.load(bag_path / 'results/heightmap.npy', allow_pickle=True)
+>>>>>>> Stashed changes
     
     xs = np.unique(hmap[:, 0])
     ys = np.unique(hmap[:, 1])
@@ -50,7 +57,7 @@ def plot_heightmap(bag_path: Path, corrected = False):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    ax.plot_surface(X, Y, Z, facecolors=facecolors, linewidth=0.15, edgecolor="k", antialiased=True,) #, facecolors=facecolors
+    ax.plot_surface(X, Y, Z, facecolors=facecolors, linewidth=0.15, edgecolor="k", antialiased=True,)
     ax.set_xlabel('X in m')
     ax.set_ylabel('Y in m')
     ax.set_zlabel('Height in m')
@@ -58,7 +65,7 @@ def plot_heightmap(bag_path: Path, corrected = False):
     # Add colorbar explaining the error colors
     color_mapping = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
     color_mapping.set_array([])
-    fig.colorbar(color_mapping, ax=ax, label="Error in mm", shrink=0.7, pad=0.1)
+    #fig.colorbar(color_mapping, ax=ax, label="Error in mm", shrink=0.7, pad=0.1)
 
     # Matching axes to look realistic
     ax.set_box_aspect((
