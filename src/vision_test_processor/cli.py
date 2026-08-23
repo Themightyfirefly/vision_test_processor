@@ -1,8 +1,15 @@
 import argparse
 from pathlib import Path
 import json
+import re 
 
-from vision_test_processor_.eval import eval_heightmap, eval_odom, eval_system_diagnostics
+from vision_test_processor_.eval import (
+    eval_heightmap,
+    eval_odom,
+    eval_system_diagnostics,
+    eval_individual_effects,
+    eval_dual_effects
+)
 from vision_test_processor_.exporter import (
     export_camera_pos,
     export_eval,
@@ -14,7 +21,7 @@ from vision_test_processor_.exporter import (
     export_starting_times
 )
 from vision_test_processor_.ground_truths import extract_triangles
-from vision_test_processor_.join_results import join_results
+from vision_test_processor_.join_results import join_results, match_ids_to_bags, get_results_per_id
 from vision_test_processor_.plotting import plot_heightmap, plot_system_diagnostics, plot_odom, plot_odom_raw
 from vision_test_processor_.processing import get_camera_positions, load_mocap_data, get_test_area
 
@@ -67,6 +74,7 @@ def cli():
     joint_parser.set_defaults(func=call_join)
     joint_parser.add_argument('test_bag_locations', nargs='+', help='Paths to the directories that includes the test bag directories')
     joint_parser.add_argument('--write_to', default='joint_test_results.csv', help='Path to the output csv file. Default is ./joint_test_results.csv')
+    joint_parser.add_argument('--factors', default='', help='Path to a file containing the experiment factors.')
 
     args = parser.parse_args()
     args.func(args)
@@ -151,4 +159,15 @@ def eval(args):
 
 def call_join(args):
     test_dirs = [Path(test_dir) for test_dir in args.test_bag_locations]
-    join_results(test_dirs, Path(args.write_to))
+    results = join_results(test_dirs, Path(args.write_to))
+    
+    if args.factors:
+        # Factor information is given, so effects between factors can be investigated
+        with open(args.factors, 'r') as f:
+            factors = json.load(f)
+        bags_per_id = match_ids_to_bags(test_dirs, factors)
+        res_per_id = get_results_per_id(bags_per_id)
+        indiv_results = eval_individual_effects(res_per_id, factors)
+        print(indiv_results)
+        pair_effects = eval_dual_effects(res_per_id, factors)
+        print(pair_effects)
