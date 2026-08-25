@@ -6,6 +6,15 @@ from vision_test_processor_.camera_calc import create_frame, local_to_global, ma
 
 
 def load_mocap_data(path : str, start_time: float) -> dict[str, list[str]]:
+    """Read a raw Vicon Nexus csv export and extract data.
+    
+    Arguments:
+        path: csv data including the mocap export data.
+        start_time: Time in the recording at which to start the test data.
+    
+    Returns:
+        Dictionary with the mocap data.
+    """
     trj_reached = False
     header = []
     data = {'time': []}
@@ -43,6 +52,12 @@ def load_mocap_data(path : str, start_time: float) -> dict[str, list[str]]:
         return data                       
 
 def get_camera_positions(raw_data, mocap_start):
+    """Extract the camera positions over time from mocap data.
+    
+    Arguments:
+        raw_data: Dictionary including the mocap data.
+        mocap_start: Time at which the test starts in the mocap recording.
+    """
     camera_pos = {
         'time': [],
         'x': [],
@@ -75,6 +90,15 @@ def get_camera_positions(raw_data, mocap_start):
     return camera_pos
 
 def get_test_area(triangles):
+    """Calculate the to be investigated test area.
+    
+    Includes all triangles to be investigated and applies padding defined in config.
+    
+    Arguments:
+        triangles: List of triangles used for the test.
+    
+    Returns: Tuple including the test area position.
+    """
     max_x = max([tr[i]['x'] for tr in triangles for i in range(3)]) + TEST_AREA_PADDING_X
     min_x = min([tr[i]['x'] for tr in triangles for i in range(3)]) - TEST_AREA_PADDING_X
     max_y = max([tr[i]['y'] for tr in triangles for i in range(3)]) + TEST_AREA_PADDING_Y

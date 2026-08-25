@@ -5,6 +5,11 @@ import json
 from pathlib import Path
 
 def plot_system_diagnostics(bag_path: Path):
+    """Plot the recorded system diagnostics.
+    
+    Arguments:
+        bag_path: Bag which includes the to be plotted data.
+    """
     with open(bag_path / 'results/system_diagnostics.json', 'r') as f:
         diag = json.load(f)
 
@@ -15,6 +20,12 @@ def plot_system_diagnostics(bag_path: Path):
     plt.show()
 
 def plot_heightmap(bag_path: Path, corrected = False):
+    """Plot the recorded heightmap.
+    
+    Arguments:
+        bag_path: Bag which includes the to be plotted data.
+        corrected: Whether to use the corrected heightmap data (accounting for odom error).
+    """
     filename = 'heightmap_corrected' if corrected else 'heightmap'
     hmap = np.load(bag_path / f'results/{filename}.npy', allow_pickle=True)
     
@@ -70,7 +81,12 @@ def plot_heightmap(bag_path: Path, corrected = False):
     
     plt.show()
 
-def plot_odom(bag_path):
+def plot_odom(bag_path: Path):
+    """Plot the recorded odom error.
+    
+    Arguments:
+        bag_path: Bag which includes the to be plotted data.
+    """
     with open(bag_path / 'results/odom_errors.json', 'r') as f:
         odom = json.load(f)
         
@@ -87,7 +103,12 @@ def plot_odom(bag_path):
         
     plt.show()
 
-def plot_odom_raw(bag_path):
+def plot_odom_raw(bag_path: Path):
+    """Plot the recorded ground truth and calculated odom.
+    
+    Arguments:
+        bag_path: Bag which includes the to be plotted data.
+    """
     with open(bag_path / 'results/odom_raw_rec.json', 'r') as f:
         odom_rec = json.load(f)
     with open(bag_path / 'results/odom_raw_truth.json', 'r') as f:

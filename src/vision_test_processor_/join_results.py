@@ -2,6 +2,15 @@ from pathlib import Path
 import json
 
 def join_results(targets: list[Path], write_to: Path):
+    """Combine the results of multiple tests in one csv file.
+    
+    Arguments:
+        targets: List of Paths to bags to be included.
+        write_to: csv file where the results are written to.
+    
+    Returns:
+        Combined results.
+    """
     # For each dir
     all_results = []
     for target in targets:
@@ -44,6 +53,15 @@ def join_results(targets: list[Path], write_to: Path):
 
 
 def match_ids_to_bags(targets: list[Path], factors: dict):
+    """Extract a list of bags that belong to a test id.
+    
+    Arguments:
+        targets: List of bags to be matched.
+        factors: Dictionary including the ids as keys.
+    
+    Returns:
+        Dictionary matching ids to lists of the corresponding bags.
+    """
     bags_per_id = {}
     for factor in factors.keys():
         bags_per_id[factor] = [
@@ -55,7 +73,14 @@ def match_ids_to_bags(targets: list[Path], factors: dict):
 
 
 def get_results_per_id(bags_per_id: dict):
-    """Combines the results so that we have single values for each id."""
+    """Combines the results so that we have single values for each id.
+    
+    Arguments:
+        bags_per_id: Dictionary with structure id -> list of corresponding bags.
+        
+    Returns:
+        Dictionary with structure id -> results.
+    """
     res_per_id = {}
     # Extract results from individual files
     for id in bags_per_id:

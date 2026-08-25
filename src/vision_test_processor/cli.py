@@ -29,6 +29,7 @@ from vision_test_processor.config import *
 
 
 def cli():
+    """Command line interface definitions for the vision_test application."""
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest='command', required=True)
 
@@ -81,6 +82,11 @@ def cli():
 
         
 def plot(args):
+    """Processing cli arguments given with vision_test call.
+    
+    Arguments:
+        args: argparse arguments
+    """
     match args.target:
         case 'heightmap':
             plot_heightmap(Path(args.directory_location))
@@ -97,6 +103,11 @@ def plot(args):
 
 
 def prep(args):
+    """Reading mocap data and writing the ground truths for a testcase.
+    
+    Arguments:
+        args: argparse arguments
+    """
     dir_path = Path(args.directory_location)
     csv_files = [f.name for f in list(dir_path.glob("*.csv"))]
     mocap_name = ""
@@ -137,6 +148,11 @@ def prep(args):
         export_test_area(dir_path, test_area)
 
 def eval(args):
+    """Combine the test results from one testcase into single numbers.
+    
+    Arguments:
+        args: argparse arguments
+    """
     dirs_to_eval = []
     if len(args.directory_location) == 0:
         raise IndexError('Path to bag directory required.')
@@ -158,6 +174,11 @@ def eval(args):
         export_eval(dir_path, results)
 
 def call_join(args):
+    """Use the results from bags to generate an overall experiment result.
+    
+    Arguments:
+        args: argparse arguments
+    """
     test_dirs = [Path(test_dir) for test_dir in args.test_bag_locations]
     results = join_results(test_dirs, Path(args.write_to))
     

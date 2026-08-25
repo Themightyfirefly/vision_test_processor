@@ -4,6 +4,14 @@ from itertools import product
 from vision_test_processor.config import *
 
 def translate_triangle(triangle: list[dict[str, float]]):
+    """Translate the triangle to account for marker thickness.
+    
+    Arguments:
+        triangle: List of points marking the triangle.
+        
+    Returns:
+        Translated triangle.
+    """
     p1 = np.array([triangle[0]['x'], triangle[0]['y'], triangle[0]['z']])
     p2 = np.array([triangle[1]['x'], triangle[1]['y'], triangle[1]['z']])
     p3 = np.array([triangle[2]['x'], triangle[2]['y'], triangle[2]['z']])        
@@ -26,6 +34,16 @@ def translate_triangle(triangle: list[dict[str, float]]):
     return triangle
 
 def extract_triangles(raw_data, obstacle: str, triangles_markers: list[list[str]]):
+    """Extract the triangle positions from the raw mocap recordings.
+    
+    Arguments:
+        raw_data: Vicon Nexus mocap recording.
+        obstacle: Name of the obstacle in the mocap naming (consisting out of triangles).
+        triangles_markers: List of marker names that make up the triangles.
+    
+    Returns:
+        List containing the extracted triangle positions.
+    """
     keys = set([e for tr_list in triangles_markers for e in tr_list])
     marker_data = {}
     

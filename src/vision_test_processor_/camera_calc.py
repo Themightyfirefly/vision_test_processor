@@ -10,9 +10,19 @@ def create_frame(
     """
     Create a right-handed coordinate frame from three points.
 
+    The created frame will have the right marker as origin.
+    The y axis is parallel to the vector from right to left marker.
+    The z axis is parallel to the vector from the middle of right, left to the top marker.
+    The x axis follows the right hand rule considering y and z axis.
+
+    Arguments:
+        right: Position in space of the right mocap marker
+        left: Position in space of the left mocap marker
+        top: Position in space of the top mocap marker
+
     Returns:
-      origin: shape (3,)
-      rotation_matrix: shape (3, 3)
+        origin in shape (3,)
+        rotation_matrix in shape (3, 3)
     """
     right = np.asarray(right, dtype=float)
     left = np.asarray(left, dtype=float)
@@ -63,8 +73,15 @@ def local_to_global(
     rotation_matrix: np.ndarray,
 ) -> np.ndarray:
     """
-    Convert a point from the constructed local frame
-    into global coordinates.
+    Convert a point from the constructed local frame into global coordinates.
+    
+    Arguments:
+        local_point: Position of the point to be converted.
+        origin: Origin of the local frame in global coordinates.
+        rotation_matrix: Describing rotation of the local frame in respect of global frame.
+    
+    Returns:
+        The global coordinates
     """
     local_point = np.asarray(local_point, dtype=float)
 
@@ -83,6 +100,14 @@ def global_to_local(
 ) -> np.ndarray:
     """
     Convert a point from global coordinates into the local frame.
+    
+    Arguments:
+        local_point: Position of the point to be converted.
+        origin: Origin of the local frame in global coordinates.
+        rotation_matrix: Describing rotation of the local frame in respect of global frame.
+    
+    Returns:
+        The local coordinates
     """
     global_point = np.asarray(global_point, dtype=float)
 
@@ -93,7 +118,22 @@ def global_to_local(
 
     return rotation_matrix.T @ (global_point - origin)
 
-def markers_to_camera(right: list[float], left: list[float], top: list[float]):    
+def markers_to_camera(right: list[float], left: list[float], top: list[float]):
+    """Calculate the position and rotation of the camera based on the given markers.
+    
+    It is assumed that an upside down T shape is used as the markerset.
+    
+    Arguments:
+        right: Position of the right marker.
+        left: Position of the left marker.
+        top: Position of the top marker.
+    
+    Returns:
+        Position of the camera in global space.
+        Roll of the camera.
+        Pitch of the camera.
+        Yaw of the camera.
+    """   
     # Calculate the position of the right mocap marker,
     # and the rotation so that x is corresponding to the x axis of the camera (pointing to the front)
     origin, rotation_matrix = create_frame(np.array(right), np.array(left), np.array(top))
