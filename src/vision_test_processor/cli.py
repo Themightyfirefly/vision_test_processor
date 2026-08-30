@@ -187,8 +187,38 @@ def call_join(args):
         with open(args.factors, 'r') as f:
             factors = json.load(f)
         bags_per_id = match_ids_to_bags(test_dirs, factors)
-        res_per_id = get_results_per_id(bags_per_id)
+        """res_per_id = get_results_per_id(bags_per_id)
         indiv_results = eval_individual_effects(res_per_id, factors)
         print(indiv_results)
         pair_effects = eval_dual_effects(res_per_id, factors)
-        print(pair_effects)
+        print(pair_effects)"""
+        
+        # statistical analysis
+        import pandas as pd
+        from vision_test_processor_.join_results import generate_experiment_df
+        df = generate_experiment_df(bags_per_id, factors)
+        #print(df)
+        
+        import statsmodels.formula.api as smf
+        model_terms = """
+            F_1 + F_2 + F_3 + F_4 + F_5 + F_6
+            + F_1:F_2
+            + F_1:F_3
+            + F_1:F_4
+            + F_1:F_5
+            + F_1:F_6
+            + F_2:F_4
+            + F_2:F_6
+        """
+        responses = [
+            "mean_cpu_usage",
+            "variance_cpu_usage",
+            "mean_odom_error",
+            "variance_odom_error",
+            "mean_heightmap_error",
+            "max_heightmap_error",
+        ]
+        models = {}
+        for response in responses:
+            models[response] = smf.ols(formula=f"{response} ~ {model_terms}", data=df).fit()
+        print(models["max_heightmap_error"].summary())

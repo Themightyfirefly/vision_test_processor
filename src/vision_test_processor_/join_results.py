@@ -1,5 +1,8 @@
 from pathlib import Path
 import json
+import pandas as pd
+
+from vision_test_processor_.eval import calc_mean
 
 def join_results(targets: list[Path], write_to: Path):
     """Combine the results of multiple tests in one csv file.
@@ -91,16 +94,40 @@ def get_results_per_id(bags_per_id: dict):
         
         # Build averages over individual results
         res_per_id[id] = {}
-        mean_cpu_usages = [res['mean_cpu_usage'] for res in results]
-        res_per_id[id]['mean_of_mean_cpu_usage'] = sum(mean_cpu_usages) / len(mean_cpu_usages)
-        res_per_id[id]['max_cpu_usage'] = max([res['max_cpu_usage'] for res in results])
+        res_per_id[id]['mean_cpu_usage'] = calc_mean([res['mean_cpu_usage'] for res in results])
+        res_per_id[id]['variance_cpu_usage'] = calc_mean([res['variance_cpu_usage'] for res in results])
         
-        mean_odom_error = [res['mean_odom_error'] for res in results]
-        res_per_id[id]['mean_of_mean_odom_error'] = sum(mean_odom_error) / len(mean_odom_error)
-        res_per_id[id]['max_odom_error'] = max([res['max_odom_error'] for res in results])
+        res_per_id[id]['mean_odom_error'] = calc_mean([res['mean_odom_error'] for res in results])
+        res_per_id[id]['variance_odom_error'] = calc_mean([res['variance_odom_error'] for res in results])
         
-        mean_heightmap_error = [res['mean_heightmap_error'] for res in results]
-        res_per_id[id]['mean_of_mean_heightmap_error'] = sum(mean_heightmap_error) / len(mean_heightmap_error)
-        res_per_id[id]['max_heightmap_error'] = max([res['max_heightmap_error'] for res in results])
+        res_per_id[id]['mean_heightmap_error'] = calc_mean([res['mean_heightmap_error'] for res in results])
+        res_per_id[id]['variance_heightmap_error'] = calc_mean([res['variance_heightmap_error'] for res in results])
     
     return res_per_id
+
+
+def generate_experiment_df(bags_per_id: dict, factors: dict):
+    """Generates a dataframe in which each row represents one test.
+    
+    Arguments:
+        bags_per_id:
+        factors:
+    
+    Returns:
+        data frame
+    """
+    keys = ["mean_cpu_usage", "variance_cpu_usage", "mean_odom_error", "variance_odom_error", "mean_heightmap_error", "max_heightmap_error"]
+    data = []
+    for id in bags_per_id:
+        for bag in bags_per_id[id]:
+            row = factors[str(id)].copy()
+            # Convert factor range from 0/1 to -1/1, will help with analysis
+            row = [1 if val == 1 else -1 for val in row]
+            with open(bag / "results/test_results.json", 'r') as f:
+                result = json.load(f)
+            
+            row += [result[key] for key in keys]
+            data.append(row)
+    
+    column_names = [f"F_{i+1}" for i in range(len(factors[list(factors.keys())[0]]))] + keys
+    return pd.DataFrame(data, columns=column_names)
