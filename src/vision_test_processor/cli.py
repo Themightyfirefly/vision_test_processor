@@ -115,6 +115,8 @@ def prep(args):
         mocap_name = "mocap_raw.csv"
     elif len(csv_files) == 1:
         mocap_name = csv_files[0]
+    elif len(csv_files) == 0:
+        raise ValueError("No csv file found in bag. Add the mocap file before generating test_description.")
     else:
         raise ValueError("More than one csv file found. Rename the mocap file to 'mocap_raw.csv'")
 
