@@ -14,6 +14,7 @@ RIGHT = 'right'
 TOP = 'top'
 
 HIGHSTEP_TRIANGLES = [['top_front_left', 'top_front_right', 'top_back_left'], ['top_front_right', 'top_back_left', 'top_back_right']]
+#HIGHSTEP_TRIANGLES = []
 
 # Translation for each marker (distance center to base) in mm
 MARKER_TRANS = 1

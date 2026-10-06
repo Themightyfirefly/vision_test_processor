@@ -99,6 +99,9 @@ def get_test_area(triangles):
     
     Returns: Tuple including the test area position.
     """
+    if not len(triangles):
+        return None
+
     max_x = max([tr[i]['x'] for tr in triangles for i in range(3)]) + TEST_AREA_PADDING_X
     min_x = min([tr[i]['x'] for tr in triangles for i in range(3)]) - TEST_AREA_PADDING_X
     max_y = max([tr[i]['y'] for tr in triangles for i in range(3)]) + TEST_AREA_PADDING_Y

@@ -147,7 +147,8 @@ def prep(args):
         triangles = extract_triangles(raw_data, HIGHSTEP, HIGHSTEP_TRIANGLES)
         export_triangles(dir_path, triangles)
         test_area = get_test_area(triangles)
-        export_test_area(dir_path, test_area)
+        if test_area:
+            export_test_area(dir_path, test_area)
 
 def eval(args):
     """Combine the test results from one testcase into single numbers.
